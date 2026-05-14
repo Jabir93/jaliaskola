@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema & Kalender – Jaliaskola</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark: #241824;
+            --gold: #c8a84b;
+            --gold-light: #e2c97e;
+            --gold-dim: rgba(200, 168, 75, 0.15);
+            --white: #ffffff;
+            --light-bg: #f7f5f0;
+            --text-dark: #2c2c2c;
+            --text-mid: #f6eded;
+            --booked: #7b3f00;
+            --booked-bg: #fff3e0;
+            --selected: #1a4a2e;
+            --selected-bg: #e8f5e9;
+            --today-border: #c8a84b;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            background: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 64px;
+            flex-wrap: wrap;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--dark);
+            font-weight: bold;
+        }
+
+        .nav-logo span {
+            color: var(--white);
+            font-size: 14px;
+            letter-spacing: 1px;
+            font-family: sans-serif;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        nav ul a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-family: sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: color .2s;
+        }
+
+        nav ul a:hover,
+        nav ul a.active {
+            color: var(--gold);
+        }
+
+        /* HERO */
+        .hero {
+            background: var(--dark);
+            padding: 60px 24px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 60%, rgba(200, 168, 75, 0.10) 0%, transparent 70%);
+        }
+
+        .hero-label {
+            font-family: sans-serif;
+            font-size: 11px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+        .hero h1 {
+            color: var(--white);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* LEGEND */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            padding: 24px 20px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            color: #555;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .legend-dot.booked {
+            background: var(--booked-bg);
+            border: 2px solid var(--booked);
+        }
+
+        .legend-dot.selected {
+            background: var(--selected-bg);
+            border: 2px solid var(--selected);
+        }
+
+        .legend-dot.today-dot {
+            background: var(--white);
+            border: 2px solid var(--gold);
+        }
+
+        .legend-dot.empty {
+            background: #ece9e2;
+            border: 1px solid #ddd;
+        }
+
+        /* YEAR NAV */
+        .year-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 28px 20px 8px;
+        }
+
+        .year-nav button {
+            background: var(--dark);
+            color: var(--gold);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s;
+        }
+
+        .year-nav button:hover {
+            background: #3a2a3a;
+        }
+
+        .year-nav h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--dark);
+            letter-spacing: 3px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* YEAR GRID */
+        .year-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px 60px;
+        }
+
+        /* MONTH CARD */
+        .month-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8e4dc;
+        }
+
+        .month-card-header {
+            background: var(--dark);
+            color: var(--gold);
+            text-align: center;
+            padding: 12px 8px;
+            font-family: sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            padding: 8px;
+        }
+
+        .day-header {
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--gold);
+            padding: 4px 2px 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            border-radius: 5px;
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #444;
+            cursor: pointer;
+            padding: 3px 2px 2px;
+            border: 1.5px solid transparent;
+            transition: all .15s;
+            position: relative;
+            user-select: none;
+        }
+
+        .day-cell:hover:not(.empty-cell):not(.past-day) {
+            border-color: var(--gold);
+            background: var(--gold-dim);
+        }
+
+        .day-cell.empty-cell {
+            cursor: default;
+        }
+
+        .day-cell.today {
+            border-color: var(--gold) !important;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .day-cell.booked-day {
+            background: var(--booked-bg);
+            border-color: #e0a060;
+            color: var(--booked);
+            font-weight: bold;
+        }
+
+        .day-cell.user-booked {
+            background: var(--selected-bg);
+            border-color: var(--selected);
+            color: var(--selected);
+            font-weight: bold;
+        }
+
+        .day-cell.past-day {
+            opacity: 0.38;
+            cursor: default;
+        }
+
+        .day-num {
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        .dot-row {
+            display: flex;
+            gap: 2px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .event-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--booked);
+            flex-shrink: 0;
+        }
+
+        .event-dot.user-dot {
+            background: var(--selected);
+        }
+
+        /* MODAL / SIDE PANEL */
+        .panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(36, 24, 36, 0.45);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .panel-overlay.open {
+            display: flex;
+            animation: fadeIn .2s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .booking-panel {
+            background: var(--white);
+            border-radius: 16px 16px 0 0;
+            padding: 32px 28px 36px;
+            width: 100%;
+            max-width: 480px;
+            animation: slideUp .25s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .panel-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #888;
+            line-height: 1;
+            margin-top: -4px;
+        }
+
+        .panel-date-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            color: var(--dark);
+            font-weight: 400;
+            margin-bottom: 6px;
+        }
+
+        .panel-sub {
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .panel-events {
+            margin-bottom: 20px;
+        }
+
+        .panel-event-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: var(--booked-bg);
+            border-left: 3px solid var(--booked);
+            margin-bottom: 8px;
+        }
+
+        .panel-event-item .event-icon {
+            font-size: 16px;
+        }
+
+        .panel-event-item .event-name {
+            font-family: sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--booked);
+        }
+
+        .panel-event-item .event-type {
+            font-family: sans-serif;
+            font-size: 11px;
+            color: #999;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .panel-section-title {
+            font-family: sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .panel-name-input {
+            width: 100%;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-family: sans-serif;
+            font-size: 14px;
+            color: var(--dark);
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color .2s;
+        }
+
+        .panel-name-input:focus {
+            border-color: var(--gold);
+        }
+
+        .panel-note-input {
+            width: 100%;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-family: sans-serif;
+            font-size: 13px;
+            color: var(--dark);
+            outline: none;
+            margin-bottom: 14px;
+            resize: vertical;
+            min-height: 70px;
+            transition: border-color .2s;
+        }
+
+        .panel-note-input:focus {
+            border-color: var(--gold);
+        }
+
+        .panel-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-family: sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .panel-btn.book {
+            background: var(--dark);
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .panel-btn.book:hover {
+            background: #3a2a3a;
+        }
+
+        .panel-btn.cancel {
+            background: #f5e8e8;
+            color: #c0392b;
+        }
+
+        .panel-btn.cancel:hover {
+            background: #fad7d7;
+        }
+
+        /* BOOKING LIST */
+        .bookings-section {
+            max-width: 860px;
+            margin: 0 auto 60px;
+            padding: 0 24px;
+        }
+
+        .bookings-title {
+            font-family: sans-serif;
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .bookings-h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .booking-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 16px 18px;
+            border: 1px solid #e4dfd6;
+            border-left: 4px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .booking-card.user-booking {
+            border-left-color: var(--selected);
+        }
+
+        .booking-card .bc-date {
+            font-family: sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .booking-card .bc-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
+            color: var(--dark);
+            margin-bottom: 3px;
+        }
+
+        .booking-card .bc-note {
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .booking-card .bc-tag {
+            display: inline-block;
+            margin-top: 8px;
+            font-family: sans-serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: var(--gold-dim);
+            color: var(--booked);
+            font-weight: bold;
+        }
+
+        .booking-card.user-booking .bc-tag {
+            background: rgba(26, 74, 46, 0.10);
+            color: var(--selected);
+        }
+
+        .no-bookings {
+            text-align: center;
+            color: #aaa;
+            font-family: sans-serif;
+            font-size: 14px;
+            padding: 30px 0;
+        }
+
+        footer {
+            background: var(--dark);
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 40px 20px;
+            font-family: sans-serif;
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            nav {
+                padding: 0 16px;
+            }
+
+            .year-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                padding: 12px 12px 40px;
+            }
+
+            .month-grid {
+                gap: 1px;
+                padding: 5px;
+            }
+
+            .day-cell {
+                font-size: 10px;
+            }
+
+            .booking-panel {
+                border-radius: 16px 16px 0 0;
+                padding: 24px 18px 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <img src="new_logo.png" alt="Logo" class="nav-logo-icon">
+            <span>Jaliaskola</span>
+        </a>
+        <ul>
+            <li><a href="index.html">Hem</a></li>
+            <li><a href="om.html">Om Oss</a></li>
+            <li><a href="kalender.html" class="active">Schema</a></li>
+            <li><a href="ovningslage.html">AI-Övasjälv</a></li>
+            <li><a href="foraldrar.html">Föräldrar</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-label">Jaliaskola</div>
+        <h1>Schema & Kalender</h1>
+        <p>Se alla bokade datum och lektionsplaner. Klicka på ett datum för att visa detaljer eller boka din plats.</p>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-dot booked"></div> Planerad lektion / aktivitet
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot selected"></div> Din bokning
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot today-dot"></div> Idag
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot empty"></div> Ledigt datum
+        </div>
+    </div>
+
+    <!-- YEAR NAV -->
+    <div class="year-nav">
+        <button id="prevYear">&#8592;</button>
+        <h2 id="yearLabel">2026</h2>
+        <button id="nextYear">&#8594;</button>
+    </div>
+
+    <!-- YEAR GRID -->
+    <div class="year-grid" id="yearGrid"></div>
+
+    <!-- BOOKINGS LIST -->
+    <div class="bookings-section">
+        <div class="bookings-title">Planerat & Bokat</div>
+        <div class="bookings-h2">Alla bokningar</div>
+        <div class="bookings-grid" id="bookingsList"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© Jaliaskola 2026 | <a href="mailto:info@jaliaskola.se">info@jaliaskola.se</a></p>
+    </footer>
+
+    <!-- BOOKING PANEL -->
+    <div class="panel-overlay" id="panelOverlay">
+        <div class="booking-panel">
+            <button class="panel-close" id="panelClose">✕</button>
+            <div class="panel-date-label" id="panelDateLabel"></div>
+            <div class="panel-sub" id="panelDateSub"></div>
+
+            <div class="panel-events" id="panelEvents"></div>
+
+            <div id="bookingForm">
+                <div class="panel-section-title">Boka detta datum</div>
+                <input class="panel-name-input" id="bookingName" type="text" placeholder="Ditt namn" maxlength="60">
+                <textarea class="panel-note-input" id="bookingNote" placeholder="Anteckning (valfritt)..."
+                    maxlength="120"></textarea>
+                <button class="panel-btn book" id="confirmBookBtn">Bekräfta bokning</button>
+            </div>
+            <div id="cancelForm" style="display:none">
+                <button class="panel-btn cancel" id="cancelBookBtn">Avboka detta datum</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MONTH_NAMES = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
+        const DAY_HEADERS = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
+
+        // ---- PLANNED EVENTS (Admin-satta, synliga för alla) ----
+        const plannedEvents = {
+            "2026-01-12": { name: "Lektion – Surah Al-Fatiha", type: "Lektion", icon: "📖" },
+            "2026-01-19": { name: "Lektion – Tajweed Grundkurs", type: "Lektion", icon: "📖" },
+            "2026-01-26": { name: "Föräldramöte", type: "Möte", icon: "👨‍👩‍👧" },
+            "2026-02-02": { name: "Lektion – Surah Al-Ikhlas", type: "Lektion", icon: "📖" },
+            "2026-02-09": { name: "Prov – Baskunskap", type: "Prov", icon: "✏️" },
+            "2026-02-16": { name: "Lektion – Surah Al-Falaq", type: "Lektion", icon: "📖" },
+            "2026-03-03": { name: "Lektion – Arabiska Bokstäver", type: "Lektion", icon: "📖" },
+            "2026-03-10": { name: "Lektion – Surah An-Nas", type: "Lektion", icon: "📖" },
+            "2026-03-24": { name: "Ramadan Special Lektion", type: "Speciell", icon: "🌙" },
+            "2026-03-31": { name: "Lektion – Ramadan & Böner", type: "Lektion", icon: "📖" },
+            "2026-04-07": { name: "Lektion – Surah Al-Kawthar", type: "Lektion", icon: "📖" },
+            "2026-04-14": { name: "Prov – Tajweed", type: "Prov", icon: "✏️" },
+            "2026-04-28": { name: "Eid Firande", type: "Högtid", icon: "🎉" },
+            "2026-05-05": { name: "Lektion – Surah Al-Asr", type: "Lektion", icon: "📖" },
+            "2026-05-12": { name: "Lektion – Tajweed Avancerad", type: "Lektion", icon: "📖" },
+            "2026-05-19": { name: "Lektion – Surah Al-Fil", type: "Lektion", icon: "📖" },
+            "2026-05-26": { name: "Terminsavslutning VT", type: "Speciell", icon: "🎓" },
+            "2026-08-25": { name: "Terminsstart HT", type: "Speciell", icon: "🎓" },
+            "2026-09-08": { name: "Lektion – Repetition", type: "Lektion", icon: "📖" },
+            "2026-09-15": { name: "Prov – Hösttermin", type: "Prov", icon: "✏️" },
+            "2026-10-06": { name: "Lektion – Surah Al-Masad", type: "Lektion", icon: "📖" },
+            "2026-10-20": { name: "Föräldramöte HT", type: "Möte", icon: "👨‍👩‍👧" },
+            "2026-11-10": { name: "Lektion – Surah Al-Humazah", type: "Lektion", icon: "📖" },
+            "2026-11-24": { name: "Prov – Halvtermin", type: "Prov", icon: "✏️" },
+            "2026-12-08": { name: "Lektion – Årsrepetition", type: "Lektion", icon: "📖" },
+            "2026-12-15": { name: "Terminsavslutning HT", type: "Speciell", icon: "🎓" },
+            "2026-12-22": { name: "Uppehåll – God Jul & Nyår", type: "Uppehåll", icon: "❄️" },
+        };
+
+        // ---- USER BOOKINGS (localStorage) ----
+        let userBookings = JSON.parse(localStorage.getItem('jaliyaa_bookings') || '{}');
+
+        function saveBookings() {
+            localStorage.setItem('jaliyaa_bookings', JSON.stringify(userBookings));
+        }
+
+        let currentYear = new Date().getFullYear();
+        let selectedDate = null;
+
+        function dateKey(y, m, d) {
+            return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
+
+        function isoToReadable(iso) {
+            const [y, m, d] = iso.split('-');
+            return `${parseInt(d)} ${MONTH_NAMES[parseInt(m) - 1]} ${y}`;
+        }
+
+        function buildYear(year) {
+            const grid = document.getElementById('yearGrid');
+            grid.innerHTML = '';
+            const today = new Date();
+
+            for (let month = 0; month < 12; month++) {
+                const card = document.createElement('div');
+                card.className = 'month-card';
+
+                const header = document.createElement('div');
+                header.className = 'month-card-header';
+                header.textContent = MONTH_NAMES[month].toUpperCase();
+                card.appendChild(header);
+
+                const mgrid = document.createElement('div');
+                mgrid.className = 'month-grid';
+
+                // Day headers
+                DAY_HEADERS.forEach(d => {
+                    const dh = document.createElement('div');
+                    dh.className = 'day-header';
+                    dh.textContent = d;
+                    mgrid.appendChild(dh);
+                });
+
+                // First day of month (0=Sun..6=Sat → convert to Mon-first)
+                let firstDay = new Date(year, month, 1).getDay();
+                firstDay = (firstDay === 0) ? 6 : firstDay - 1;
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                // Empty cells
+                for (let e = 0; e < firstDay; e++) {
+                    const ec = document.createElement('div');
+                    ec.className = 'day-cell empty-cell';
+                    mgrid.appendChild(ec);
+                }
+
+                // Day cells
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const key = dateKey(year, month, d);
+                    const cellDate = new Date(year, month, d);
+                    const isPast = cellDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                    const isBooked = !!plannedEvents[key];
+                    const isUserBooked = !!userBookings[key];
+
+                    const cell = document.createElement('div');
+                    cell.className = 'day-cell';
+                    if (isPast && !isToday) cell.classList.add('past-day');
+                    if (isToday) cell.classList.add('today');
+                    if (isBooked) cell.classList.add('booked-day');
+                    if (isUserBooked) cell.classList.add('user-booked');
+
+                    const num = document.createElement('div');
+                    num.className = 'day-num';
+                    num.textContent = d;
+                    cell.appendChild(num);
+
+                    if (isBooked || isUserBooked) {
+                        const dots = document.createElement('div');
+                        dots.className = 'dot-row';
+                        if (isBooked) {
+                            const dot = document.createElement('div');
+                            dot.className = 'event-dot';
+                            dots.appendChild(dot);
+                        }
+                        if (isUserBooked) {
+                            const dot = document.createElement('div');
+                            dot.className = 'event-dot user-dot';
+                            dots.appendChild(dot);
+                        }
+                        cell.appendChild(dots);
+                    }
+
+                    if (!isPast || isToday) {
+                        cell.addEventListener('click', () => openPanel(key));
+                    }
+
+                    mgrid.appendChild(cell);
+                }
+
+                card.appendChild(mgrid);
+                grid.appendChild(card);
+            }
+        }
+
+        // ---- PANEL ----
+        function openPanel(key) {
+            selectedDate = key;
+            const overlay = document.getElementById('panelOverlay');
+            const label = document.getElementById('panelDateLabel');
+            const sub = document.getElementById('panelDateSub');
+            const eventsDiv = document.getElementById('panelEvents');
+            const bookingForm = document.getElementById('bookingForm');
+            const cancelForm = document.getElementById('cancelForm');
+            const nameInput = document.getElementById('bookingName');
+            const noteInput = document.getElementById('bookingNote');
+
+            label.textContent = isoToReadable(key);
+            const [y, m, d] = key.split('-');
+            const dayDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+            const dayNames = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+            sub.textContent = dayNames[dayDate.getDay()];
+
+            // Show planned events
+            eventsDiv.innerHTML = '';
+            if (plannedEvents[key]) {
+                const e = plannedEvents[key];
+                const item = document.createElement('div');
+                item.className = 'panel-event-item';
+                item.innerHTML = `<span class="event-icon">${e.icon}</span>
+        <div><div class="event-name">${e.name}</div>
+        <div class="event-type">${e.type}</div></div>`;
+                eventsDiv.appendChild(item);
+            }
+
+            // Show user booking or form
+            if (userBookings[key]) {
+                bookingForm.style.display = 'none';
+                cancelForm.style.display = 'block';
+            } else {
+                bookingForm.style.display = 'block';
+                cancelForm.style.display = 'none';
+                nameInput.value = '';
+                noteInput.value = '';
+            }
+
+            overlay.classList.add('open');
+            overlay.style.display = 'flex';
+        }
+
+        function closePanel() {
+            const overlay = document.getElementById('panelOverlay');
+            overlay.classList.remove('open');
+            overlay.style.display = 'none';
+            selectedDate = null;
+        }
+
+        document.getElementById('panelClose').addEventListener('click', closePanel);
+        document.getElementById('panelOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('panelOverlay')) closePanel();
+        });
+
+        document.getElementById('confirmBookBtn').addEventListener('click', () => {
+            const name = document.getElementById('bookingName').value.trim();
+            if (!name) {
+                document.getElementById('bookingName').style.borderColor = '#c0392b';
+                document.getElementById('bookingName').focus();
+                return;
+            }
+            document.getElementById('bookingName').style.borderColor = '#ddd';
+            userBookings[selectedDate] = {
+                name,
+                note: document.getElementById('bookingNote').value.trim(),
+                bookedAt: new Date().toISOString()
+            };
+            saveBookings();
+            closePanel();
+            buildYear(currentYear);
+            renderBookingsList();
+        });
+
+        document.getElementById('cancelBookBtn').addEventListener('click', () => {
+            delete userBookings[selectedDate];
+            saveBookings();
+            closePanel();
+            buildYear(currentYear);
+            renderBookingsList();
+        });
+
+        // ---- BOOKINGS LIST ----
+        function renderBookingsList() {
+            const container = document.getElementById('bookingsList');
+            container.innerHTML = '';
+
+            // Merge planned + user bookings, sorted by date
+            const allKeys = new Set([...Object.keys(plannedEvents), ...Object.keys(userBookings)]);
+            const sorted = Array.from(allKeys).sort();
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const upcoming = sorted.filter(k => {
+                const [y, m, d] = k.split('-');
+                return new Date(parseInt(y), parseInt(m) - 1, parseInt(d)) >= today;
+            });
+
+            if (upcoming.length === 0) {
+                container.innerHTML = '<div class="no-bookings">Inga kommande bokningar</div>';
+                return;
+            }
+
+            upcoming.forEach(key => {
+                const isPlanned = !!plannedEvents[key];
+                const isUser = !!userBookings[key];
+
+                if (isPlanned) {
+                    const e = plannedEvents[key];
+                    const card = document.createElement('div');
+                    card.className = 'booking-card';
+                    card.innerHTML = `<div class="bc-date">${isoToReadable(key)}</div>
+          <div class="bc-name">${e.icon} ${e.name}</div>
+          <span class="bc-tag">${e.type}</span>`;
+                    container.appendChild(card);
+                }
+
+                if (isUser) {
+                    const u = userBookings[key];
+                    const card = document.createElement('div');
+                    card.className = 'booking-card user-booking';
+                    card.innerHTML = `<div class="bc-date">${isoToReadable(key)}</div>
+          <div class="bc-name">👤 ${u.name}</div>
+          ${u.note ? `<div class="bc-note">${u.note}</div>` : ''}
+          <span class="bc-tag">Din bokning</span>`;
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        // ---- YEAR NAV ----
+        document.getElementById('prevYear').addEventListener('click', () => {
+            currentYear--;
+            document.getElementById('yearLabel').textContent = currentYear;
+            buildYear(currentYear);
+        });
+        document.getElementById('nextYear').addEventListener('click', () => {
+            currentYear++;
+            document.getElementById('yearLabel').textContent = currentYear;
+            buildYear(currentYear);
+        });
+
+        // ---- INIT ----
+        document.getElementById('yearLabel').textContent = currentYear;
+        buildYear(currentYear);
+        renderBookingsList();
+    </script>
+</body>
+
+</html>

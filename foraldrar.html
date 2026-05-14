@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Föräldrar - Jaliaskola</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <img src="new_logo.png" alt="Logo" class="nav-logo-icon">
+            <span>Jaliaskola</span>
+        </a>
+        <ul>
+            <li><a href="index.html">Hem</a></li>
+            <li><a href="om.html">Om Oss</a></li>
+            <li><a href="kalender.html">Schema</a></li>
+            <li><a href="ovningslage.html">AI-Övasjälv</a></li>
+            <li><a href="foraldrar.html">Föräldrar</a></li>
+            <li>
+                <select id="languageSelector" class="lang-select">
+                    <option value="sv">Svenska</option>
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="container">
+        <div class="section-title">Föräldrar</div>
+        <h2>Överblick för vårdnadshavare</h2>
+        <div class="page-intro">
+            <p>Följ barnets utveckling med tydlig statistik, minnesmål och kommunikation. Här kan du se hur lektionerna
+                går, vad som övas och hur du kan stötta hemma.</p>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="highlight-box" id="registrationSection">
+            <h3>Skapa konto</h3>
+            <form id="registerForm">
+                <div style="margin-bottom: 15px;">
+                    <label for="regEmail">E-post:</label><br>
+                    <input type="email" id="regEmail" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="regPhone">Telefonnummer:</label><br>
+                    <input type="tel" id="regPhone" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="regPassword">Lösenord:</label><br>
+                    <input type="password" id="regPassword" required
+                        style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <button type="submit" class="btn-primary">Skapa konto</button>
+            </form>
+            <div id="registerMessage" style="margin-top: 15px; color: #d32f2f;"></div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="highlight-box" id="loginSection">
+            <h3>Logga in</h3>
+            <form id="loginForm">
+                <div style="margin-bottom: 15px;">
+                    <label for="loginEmail">E-post:</label><br>
+                    <input type="email" id="loginEmail" required style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="loginPassword">Lösenord:</label><br>
+                    <input type="password" id="loginPassword" required
+                        style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <button type="submit" class="btn-primary">Logga in</button>
+            </form>
+            <div id="loginMessage" style="margin-top: 15px; color: #d32f2f;"></div>
+        </div>
+
+        <div class="dashboard-grid" id="dashboard" style="display: none;">
+            <div class="dash-card">
+                <h3>Föräldra-dashboard</h3>
+                <div class="stat-large">82%</div>
+                <p>Aktiv läsning den här veckan.</p>
+            </div>
+            <div class="dash-card">
+                <h3>Veckorapport</h3>
+                <p>Förbättrat uttal (särskilt på bokstaven 'Qaf').</p>
+                <p>Fokus den här veckan: tajweed och versexakt läsning.</p>
+            </div>
+            <div class="dash-card">
+                <h3>Milstolpar</h3>
+                <p>Se hur ditt barn memorerar Koranen steg för steg.</p>
+                <div class="map-grid">
+                    <span class="surah-badge mastered">Al-Fatihah (Klar)</span>
+                    <span class="surah-badge mastered">Al-Ikhlas (Klar)</span>
+                    <span class="surah-badge learning">Al-Falaq (Övar)</span>
+                    <span class="surah-badge learning">An-Nas (Låst)</span>
+                </div>
+            </div>
+            <div class="dash-card">
+                <h3>Kommunikation</h3>
+                <p>Följ upp ditt barns utveckling eller ställ frågor direkt till vår personal.</p>
+                <a href="mailto:info@jaliaskola.se" class="btn-outline">Boka samtal med lärare</a>
+            </div>
+        </div>
+        <div class="dash-card">
+            <h3>Föräldra-dashboard</h3>
+            <div class="stat-large">82%</div>
+            <p>Aktiv läsning den här veckan.</p>
+        </div>
+        <div class="dash-card">
+            <h3>Veckorapport</h3>
+            <p>Förbättrat uttal (särskilt på bokstaven 'Qaf').</p>
+            <p>Fokus den här veckan: tajweed och versexakt läsning.</p>
+        </div>
+        <div class="dash-card">
+            <h3>Milstolpar</h3>
+            <p>Se hur ditt barn memorerar Koranen steg för steg.</p>
+            <div class="map-grid">
+                <span class="surah-badge mastered">Al-Fatihah (Klar)</span>
+                <span class="surah-badge mastered">Al-Ikhlas (Klar)</span>
+                <span class="surah-badge learning">Al-Falaq (Övar)</span>
+                <span class="surah-badge learning">An-Nas (Låst)</span>
+            </div>
+        </div>
+        <div class="dash-card">
+            <h3>Kommunikation</h3>
+            <p>Följ upp ditt barns utveckling eller ställ frågor direkt till vår personal.</p>
+            <a href="mailto:info@jaliaskola.se" class="btn-outline">Boka samtal med lärare</a>
+        </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">
+            <img src="new_logo.png" alt="Logo" class="footer-logo-circle">
+            <span>Jaliaskola</span>
+        </div>
+        <p>© Jaliaskola 2026 | <a href="mailto:info@jaliaskola.se">info@jaliaskola.se</a></p>
+    </footer>
+</body>
+
+</html>
