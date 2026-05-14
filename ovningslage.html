@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Övasjälv - Jaliaskola</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <img src="new_logo.png" alt="Logo" class="nav-logo-icon">
+            <span>Jaliaskola</span>
+        </a>
+        <ul>
+            <li><a href="index.html">Hem</a></li>
+            <li><a href="om.html">Om Oss</a></li>
+            <li><a href="kalender.html">Schema</a></li>
+            <li><a href="ovningslage.html">AI-Övasjälv</a></li>
+            <li><a href="foraldrar.html">Föräldrar</a></li>
+            <li>
+                <select id="languageSelector" class="lang-select">
+                    <option value="sv">Svenska</option>
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="container">
+        <div class="section-title">AI-Övasjälv</div>
+        <h2>Träna utskrift och uttal med AI</h2>
+        <div class="page-intro">
+            <p>Klicka på mikrofonen och läs versen högt. AI:n ger direkt feedback på uttalet för att hjälpa barnet öva
+                säkrare och mer självsäkert.</p>
+        </div>
+
+        <section class="ai-container">
+            <div class="arabic-text" dir="rtl">
+                <span class="word">بِسْمِ</span>
+                <span class="word">اللَّهِ</span>
+                <span class="word">الرَّحْمَٰنِ</span>
+                <span class="word">الرَّحِيمِ</span>
+            </div>
+            <button id="micBtn" class="mic-btn">🎤</button>
+            <div id="feedbackBox" class="feedback-box">Tryck på mikrofonen för att börja.</div>
+            <p>Observera: Röstigenkänning fungerar bäst i Chrome, Edge eller Safari.</p>
+        </section>
+    </section>
+
+    <footer>
+        <div class="footer-logo">
+            <img src="new_logo.png" alt="Logo" class="footer-logo-circle">
+            <span>Jaliaskola</span>
+        </div>
+        <p>© Jaliaskola 2026 | <a href="mailto:info@jaliaskola.se">info@jaliaskola.se</a></p>
+    </footer>
+</body>
+
+</html>
