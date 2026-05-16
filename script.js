@@ -168,7 +168,7 @@ function renderYearlyCalendar() {
     for (let month = 0; month < 12; month++) {
         const monthBox = document.createElement('div');
         monthBox.classList.add('month-box');
-        
+
         const h4 = document.createElement('h4');
         h4.innerText = monthNames[month];
         monthBox.appendChild(h4);
@@ -201,7 +201,7 @@ function renderYearlyCalendar() {
             dayDiv.innerText = day;
 
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            
+
             if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
                 dayDiv.classList.add('today');
             }
@@ -230,7 +230,7 @@ function openBookingModal(date) {
     display.innerText = `Datum: ${date}`;
     const noteInput = document.getElementById('bookingNote');
     noteInput.value = bookings[date] || '';
-    
+
     modal.style.display = 'block';
 }
 
@@ -251,17 +251,17 @@ async function saveBooking() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date: selectedDate, note: note })
         });
-        
+
         // Update local state and re-render
         if (note === '') {
             delete bookings[selectedDate];
         } else {
             bookings[selectedDate] = note;
         }
-        
+
         // Also update localStorage as backup
         localStorage.setItem('jaliyaBookings', JSON.stringify(bookings));
-        
+
         renderYearlyCalendar();
         closeBookingModal();
     } catch (error) {
@@ -481,6 +481,124 @@ function initAuth() {
     }
 }
 
+// Child Registration & Queue Logic
+function initChildRegistration() {
+    const childRegForm = document.getElementById('childRegistrationForm');
+    const childRegMessage = document.getElementById('childRegMessage');
+    const queueList = document.getElementById('queueList');
+    const mockAdmitBtn = document.getElementById('mockAdmitBtn');
+
+    if (!childRegForm) return;
+
+    let childQueue = JSON.parse(localStorage.getItem('jaliyaChildQueue')) || [];
+
+    function renderQueue() {
+        if (!queueList) return;
+        queueList.innerHTML = '';
+
+        if (childQueue.length === 0) {
+            queueList.innerHTML = '<p>Inga barn i kö ännu.</p>';
+            if (mockAdmitBtn) mockAdmitBtn.style.display = 'none';
+            return;
+        }
+
+        let admittedCount = 0;
+        let inQueueCount = 0;
+
+        childQueue.forEach(child => {
+            if (child.status === 'Admitted') {
+                admittedCount++;
+            } else {
+                inQueueCount++;
+            }
+        });
+
+        const statsDiv = document.createElement('div');
+        statsDiv.style.padding = '15px';
+        statsDiv.style.background = '#f9f9f9';
+        statsDiv.style.border = '1px solid #ddd';
+        statsDiv.style.borderRadius = '8px';
+        statsDiv.style.textAlign = 'center';
+
+        statsDiv.innerHTML = `
+            <div style="font-size: 1.2rem; margin-bottom: 10px;">
+                <strong>Totalt antal registrerade barn:</strong> ${childQueue.length}
+            </div>
+            <div style="display: flex; justify-content: space-around; font-size: 1.1rem;">
+                <div style="color: #d32f2f;">
+                    <strong>I kö:</strong> ${inQueueCount}
+                </div>
+                <div style="color: #2e7d32;">
+                    <strong>Antagna:</strong> ${admittedCount}
+                </div>
+            </div>
+        `;
+
+        queueList.appendChild(statsDiv);
+
+        if (mockAdmitBtn) {
+            mockAdmitBtn.style.display = inQueueCount > 0 ? 'inline-block' : 'none';
+        }
+    }
+
+    childRegForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const pnr = document.getElementById('childPnr').value;
+        const firstName = document.getElementById('childFirstName').value;
+        const lastName = document.getElementById('childLastName').value;
+        const contact = document.getElementById('parentContact').value;
+
+        // Check if already in queue
+        if (childQueue.find(c => c.pnr === pnr)) {
+            childRegMessage.style.color = '#d32f2f';
+            childRegMessage.textContent = 'Detta barn är redan registrerat i kön.';
+            return;
+        }
+
+        const newChild = {
+            pnr,
+            firstName,
+            lastName,
+            contact,
+            regDate: new Date().toISOString(),
+            status: 'In Queue'
+        };
+
+        childQueue.push(newChild);
+        localStorage.setItem('jaliyaChildQueue', JSON.stringify(childQueue));
+
+        childRegMessage.style.color = '#2e7d32';
+        childRegMessage.textContent = 'Barnet är nu registrerat i kön!';
+        childRegForm.reset();
+
+        renderQueue();
+    });
+
+    if (mockAdmitBtn) {
+        mockAdmitBtn.addEventListener('click', () => {
+            const firstInQueue = childQueue.find(c => c.status === 'In Queue');
+            if (firstInQueue) {
+                firstInQueue.status = 'Admitted';
+                localStorage.setItem('jaliyaChildQueue', JSON.stringify(childQueue));
+
+                // Show notification modal
+                const modal = document.getElementById('notificationModal');
+                const text = document.getElementById('notificationText');
+                if (modal && text) {
+                    text.innerHTML = `Ett meddelande (SMS/E-post) har skickats till <strong>${firstInQueue.contact}</strong>:<br><br>
+                    "Hej! Ert barn ${firstInQueue.firstName} ${firstInQueue.lastName} har nu blivit antagen till Jaliaskola. Välkommen!"`;
+                    modal.style.display = 'flex';
+                }
+
+                renderQueue();
+            }
+        });
+    }
+
+    renderQueue();
+}
+
 function initPage() {
     initTranslatableElements();
     const languageSelector = document.getElementById('languageSelector');
@@ -497,6 +615,10 @@ function initPage() {
 
     if (document.getElementById('registerForm')) {
         initAuth();
+    }
+
+    if (document.getElementById('childRegistrationForm')) {
+        initChildRegistration();
     }
 }
 
